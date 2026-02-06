@@ -1,59 +1,36 @@
-// Import required modules
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const User = require('./model/User')
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import connectDB from './src/config/db.js';
+import authRoutes from './src/routes/auth.js';
+import profileRoutes from './src/routes/profile.js';
+import planRoutes from './src/routes/plan.js';
+import trackerRoutes from './src/routes/tracker.js';
 
-// Create express app
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-// Middlewares
+// Middleware
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  credentials: true,
+}));
 app.use(express.json());
-app.use(cors());
 
-// MongoDB connection string (replace 'fitbuddy' with your DB name)
-mongoose.connect("mongodb://localhost:27017/Login", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => {
-  console.log("✅ MongoDB connected successfully");
-})
-.catch((err) => {
-  console.error("❌ MongoDB connection error:", err);
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/plan', planRoutes);
+app.use('/api/tracker', trackerRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Default route
-app.get("/", (req, res) => {
-  res.send("Hello from FitBuddy backend!");
-});
-
-app.post("/login", (req, res) => {
-  const { email, password } = req.body;
-
-  User.findOne({ email: email })
-    .then(user => {
-      if (user) {
-        if (user.password === password) {
-          res.json("Success");
-        } else {
-          res.json("The password is incorrect");
-        }
-      } else {
-        res.json("No record existed");
-      }
-    })
-    .catch(err => res.status(500).json("Error: " + err));
-});
-
-app.post('/register',(req,res)=>{
-     User.create(req.body)
-     .then(employees => res.json(employees))
-     .catch(err => res.json(err));
-})
-
-// Start server
-const PORT = 3001;
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on http://localhost:${PORT}`);
+// Connect to DB and start server
+connectDB().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 });
