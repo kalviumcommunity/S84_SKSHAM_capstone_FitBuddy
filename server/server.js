@@ -12,7 +12,11 @@ const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'],
+  origin: [
+    'http://localhost:5173', 
+    'http://localhost:3000',
+    process.env.FRONTEND_URL
+  ].filter(Boolean),
   credentials: true,
 }));
 app.use(express.json());
@@ -27,6 +31,11 @@ app.use('/api/tracker', trackerRoutes);
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+app.get('/',(req,res)=>{
+  console.log("You are on wrong route Broo!!!!!!!!!!!!!!");
+  
+})
 
 // Connect to DB and start server
 connectDB().then(() => {
