@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js",
+    "rund": "nodemon server.js",
     "build": "echo 'No build step needed'"
   },
   "keywords": [],
