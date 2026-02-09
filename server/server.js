@@ -33,7 +33,7 @@ app.get('/api/health', (req, res) => {
 });
 
 app.get('/',(req,res)=>{
-  console.log("You are on wrong route Broo!!!!!!!!!!!!!!");
+  res.send("You are on wrong route Broo!!!!!!!!!!!!!!");
   
 })
 
