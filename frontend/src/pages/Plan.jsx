@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Dumbbell, Utensils, RefreshCw, ChevronDown, ChevronUp,
-  Calendar, Flame, Zap,
+  Calendar, Flame, Zap, Coffee, Sun, Moon, Cookie,
 } from 'lucide-react';
 import { MotionCard, Button, Badge, Skeleton } from '../components/ui';
 import PageWrapper from '../components/layout/PageWrapper';
@@ -181,32 +181,64 @@ export default function Plan() {
                   <p className="text-muted text-lg font-medium">No diet plan yet.</p>
                 </MotionCard>
               ) : (
-                plan.dietPlan.map((meal, idx) => (
-                  <MotionCard key={idx} delay={idx * 0.05}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 bg-emerald/10 rounded-xl flex items-center justify-center">
-                        <Utensils className="w-5 h-5 text-emerald" />
+                plan.dietPlan.map((meal, idx) => {
+                  const mealMeta = {
+                    breakfast: { icon: Coffee, time: '7:00 – 9:00 AM', color: 'text-amber-400' },
+                    lunch:     { icon: Sun, time: '12:00 – 2:00 PM', color: 'text-emerald-400' },
+                    dinner:    { icon: Moon, time: '7:00 – 9:00 PM', color: 'text-indigo-400' },
+                    snack:     { icon: Cookie, time: '4:00 – 5:30 PM', color: 'text-pink-400' },
+                  };
+                  const meta = mealMeta[meal.mealType?.toLowerCase()] || { icon: Utensils, time: '', color: 'text-muted' };
+                  const MealIcon = meta.icon;
+
+                  return (
+                    <MotionCard key={idx} delay={idx * 0.05}>
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className={`w-10 h-10 bg-surface-light/50 rounded-xl flex items-center justify-center`}>
+                          <MealIcon className={`w-5 h-5 ${meta.color}`} />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-xs font-bold text-dim uppercase tracking-widest">{meal.mealType}</p>
+                          {meta.time && (
+                            <p className="text-[11px] text-muted">{meta.time}</p>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-bold text-dim uppercase tracking-widest">{meal.mealType}</p>
-                        <p className="text-[var(--text-main)] font-heading font-semibold uppercase">{meal.options?.[0]?.name || 'Meal'}</p>
-                      </div>
-                    </div>
-                    {meal.options?.map((opt, oi) => (
-                      <div key={oi} className="bg-surface-light/30 rounded-xl p-4 mb-2 last:mb-0">
-                        <p className="text-sm font-semibold text-[var(--text-main)] mb-2">{opt.name}</p>
-                        {opt.calories && (
-                          <div className="flex gap-4 text-xs text-muted">
-                            <span><Flame className="w-3 h-3 inline mr-1 text-accent" />{opt.calories} cal</span>
-                            <span>{opt.protein}g protein</span>
-                            {opt.carbs && <span>{opt.carbs}g carbs</span>}
-                            {opt.fats && <span>{opt.fats}g fats</span>}
+                      {meal.options?.map((opt, oi) => (
+                        <div key={oi} className="bg-surface-light/30 rounded-xl p-4 mb-2 last:mb-0">
+                          <div className="flex items-center justify-between mb-2">
+                            <p className="text-sm font-semibold text-[var(--text-main)]">{opt.name}</p>
+                            {opt.quantity && (
+                              <span className="text-xs bg-accent/10 text-accent px-2 py-1 rounded-lg font-medium">
+                                {opt.quantity}
+                              </span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    ))}
-                  </MotionCard>
-                ))
+                          {(opt.calories != null || opt.protein != null || opt.carbs != null || opt.fats != null) && (
+                            <div className="flex flex-wrap gap-4 text-xs text-muted mb-2">
+                              {opt.calories != null && <span><Flame className="w-3 h-3 inline mr-1 text-accent" />{opt.calories} cal</span>}
+                              {opt.protein != null && <span className="text-[var(--text-main)]">{opt.protein}g protein</span>}
+                              {opt.carbs != null && <span className="text-[var(--text-main)]">{opt.carbs}g carbs</span>}
+                              {opt.fats != null && <span className="text-[var(--text-main)]">{opt.fats}g fats</span>}
+                            </div>
+                          )}
+                          {opt.contraindications?.length > 0 && (
+                            <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2 mb-2">
+                              <p className="text-xs text-red-400 font-medium">
+                                ⚠️ <strong>Caution:</strong> Avoid if you have: {opt.contraindications.join(', ')}
+                              </p>
+                            </div>
+                          )}
+                          {opt.ingredients?.length > 0 && (
+                            <p className="text-[11px] text-dim">
+                              <strong>Ingredients:</strong> {opt.ingredients.join(', ')}
+                            </p>
+                          )}
+                        </div>
+                      ))}
+                    </MotionCard>
+                  );
+                })
               )}
             </motion.div>
           )}

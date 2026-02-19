@@ -1,14 +1,14 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   CalendarDays,
-  User,
   LogOut,
   Dumbbell,
   Sun,
   Moon,
+  Bug,
 } from 'lucide-react';
 import { logout } from '../../store/slices/authSlice';
 import { useTheme } from '../../context/ThemeContext';
@@ -16,10 +16,9 @@ import { useTheme } from '../../context/ThemeContext';
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/plan', label: 'My Plan', icon: CalendarDays },
-  { to: '/profile', label: 'Profile', icon: User },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onFeedbackClick }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((s) => s.auth);
@@ -40,9 +39,13 @@ export default function Sidebar() {
         bg-surface/70 backdrop-blur-xl border-r border-surface-border text-[var(--text-main)]"
     >
       {/* Logo */}
-      <div className="w-11 h-11 bg-accent rounded-xl flex items-center justify-center mb-6 shadow-glow shrink-0">
+      <Link
+        to="/"
+        title="Go Home"
+        className="w-11 h-11 bg-accent rounded-xl flex items-center justify-center mb-6 shadow-glow shrink-0 hover:bg-accent-hover transition-all duration-200"
+      >
         <Dumbbell className="w-5 h-5 text-white" />
-      </div>
+      </Link>
 
       {/* Nav */}
       <nav className="flex-1 flex flex-col items-center gap-1 w-full px-2">
@@ -81,6 +84,15 @@ export default function Sidebar() {
 
       {/* Bottom */}
       <div className="flex flex-col items-center gap-3 pt-4 border-t border-surface-border w-full">
+        {/* Bug Report */}
+        <button
+          onClick={onFeedbackClick}
+          title="Report a Bug / Suggest Feature"
+          className="w-9 h-9 rounded-lg flex items-center justify-center text-dim hover:text-amber-400 hover:bg-amber-500/10 transition-all duration-200"
+        >
+          <Bug className="w-5 h-5" />
+        </button>
+
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
@@ -94,12 +106,26 @@ export default function Sidebar() {
           )}
         </button>
 
-        {/* Avatar */}
-        <div className="w-9 h-9 bg-accent/15 rounded-full flex items-center justify-center shrink-0 cursor-pointer" title={user?.name}>
-          <span className="text-xs font-bold text-accent">
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
-          </span>
-        </div>
+        {/* Avatar → Profile link */}
+        <NavLink
+          to="/profile"
+          title={`${user?.name || 'Profile'} — View Profile`}
+          className={({ isActive }) =>
+            `relative w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all duration-200 ring-2 ${
+              isActive
+                ? 'ring-accent bg-accent/15'
+                : 'ring-transparent bg-accent/10 hover:ring-accent/40'
+            }`
+          }
+        >
+          {user?.avatar ? (
+            <img src={user.avatar} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+          ) : (
+            <span className="text-xs font-bold text-accent">
+              {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+            </span>
+          )}
+        </NavLink>
 
         {/* Logout */}
         <button

@@ -78,7 +78,8 @@ router.post('/water', auth, async (req, res) => {
     const { date, delta } = req.body;
     const log = await getOrCreateLog(req.user._id, date);
 
-    log.waterIntake = Math.max(0, log.waterIntake + delta);
+    // Clamp between 0 and 8 glasses
+    log.waterIntake = Math.max(0, Math.min(8, log.waterIntake + delta));
     await log.save();
 
     res.json({ log });

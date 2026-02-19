@@ -25,7 +25,8 @@ export default function Login() {
     e.preventDefault();
     const result = await dispatch(login(form));
     if (login.fulfilled.match(result)) {
-      navigate('/dashboard');
+      const user = result.payload.user;
+      navigate(user.profileComplete ? '/dashboard' : '/setup');
     }
   };
 
@@ -33,7 +34,8 @@ export default function Login() {
     onSuccess: async (response) => {
       const result = await dispatch(googleAuth({ token: response.access_token }));
       if (googleAuth.fulfilled.match(result)) {
-        navigate('/dashboard');
+        const user = result.payload.user;
+        navigate(user.profileComplete ? '/dashboard' : '/setup');
       }
     },
     onError: () => {},
@@ -149,6 +151,7 @@ export default function Login() {
               variant="secondary"
               fullWidth
               onClick={() => handleGoogle()}
+              loading={loading}
               type="button"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

@@ -11,5 +11,10 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    middlewareMode: false,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'unsafe-none',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
   },
 });

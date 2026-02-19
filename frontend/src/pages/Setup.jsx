@@ -6,10 +6,12 @@ import { ArrowRight, ArrowLeft, Check, Dumbbell } from 'lucide-react';
 import { Button } from '../components/ui';
 import { updateProfile } from '../store/slices/profileSlice';
 import { generatePlan } from '../store/slices/planSlice';
+import { loadUser } from '../store/slices/authSlice';
 import PageWrapper from '../components/layout/PageWrapper';
 import {
   GOALS, ACTIVITY_LEVELS, WORKOUT_PREFERENCES,
   DIET_PREFERENCES, BODY_PARTS, EQUIPMENT, GENDERS, BUDGETS,
+  COUNTRIES, MUSCLE_GROUPS, MEDICAL_CONDITIONS,
 } from '../utils/constants';
 import toast from 'react-hot-toast';
 
@@ -30,12 +32,17 @@ export default function Setup() {
     gender: '',
     height: '',
     weight: '',
+    country: '',
     activityLevel: '',
     workoutPreference: '',
     targetBodyParts: [],
     equipmentAvailable: [],
+    strengthParts: [],
+    weaknessParts: [],
     dietaryPreference: '',
     allergies: '',
+    medicalConditions: [],
+    customDescription: '',
     budget: 'medium',
   });
 
@@ -78,11 +85,18 @@ export default function Setup() {
       height: Number(formData.height),
       weight: Number(formData.weight),
       allergies: formData.allergies ? formData.allergies.split(',').map((a) => a.trim()) : [],
+      medicalConditions: formData.medicalConditions || [],
+      customDescription: formData.customDescription?.trim() || '',
+      strengthParts: formData.strengthParts || [],
+      weaknessParts: formData.weaknessParts || [],
+      country: formData.country || '',
     };
 
     const profileResult = await dispatch(updateProfile(profileData));
     if (updateProfile.fulfilled.match(profileResult)) {
       toast.success('Profile saved! Generating your plan...');
+      // Refresh user data to get updated profileComplete flag
+      await dispatch(loadUser());
       const planResult = await dispatch(generatePlan());
       if (generatePlan.fulfilled.match(planResult)) {
         toast.success('Your personalized plan is ready!');
@@ -108,6 +122,71 @@ export default function Setup() {
   };
 
   const progress = (step / TOTAL_STEPS) * 100;
+
+  // Full-screen loading overlay while generating
+  if (generating) {
+    return (
+      <PageWrapper>
+        <div className="min-h-screen bg-bg flex flex-col items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center gap-6 max-w-md text-center px-6"
+          >
+            {/* Animated spinner */}
+            <div className="relative w-24 h-24">
+              <motion.div
+                className="absolute inset-0 border-4 border-accent/20 rounded-full"
+              />
+              <motion.div
+                className="absolute inset-0 border-4 border-transparent border-t-accent rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Dumbbell className="w-8 h-8 text-accent" />
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-2xl font-heading font-bold text-[var(--text-main)] uppercase mb-2">
+                Generating Your Plan
+              </h2>
+              <p className="text-muted text-sm">
+                Our AI is crafting a personalized workout &amp; diet plan just for you. This may take a moment...
+              </p>
+            </div>
+
+            {/* Animated progress dots */}
+            <div className="flex gap-2">
+              {[0, 1, 2].map((i) => (
+                <motion.div
+                  key={i}
+                  className="w-3 h-3 bg-accent rounded-full"
+                  animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
+                  transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.3 }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-4 space-y-2 w-full">
+              {['Analyzing your profile...', 'Building workout routines...', 'Crafting diet plan...', 'Almost done...'].map((text, i) => (
+                <motion.p
+                  key={text}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 3, duration: 0.5 }}
+                  className="text-xs text-dim text-center"
+                >
+                  {text}
+                </motion.p>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </PageWrapper>
+    );
+  }
 
   return (
     <PageWrapper>
@@ -168,6 +247,7 @@ export default function Setup() {
                   <StepDiet
                     formData={formData}
                     updateField={updateField}
+                    toggleArrayField={toggleArrayField}
                   />
                 )}
               </motion.div>
@@ -191,7 +271,7 @@ export default function Setup() {
               ) : (
                 <Button
                   onClick={handleSubmit}
-                  loading={profileLoading || generating}
+                  loading={profileLoading}
                   disabled={!canProceed()}
                 >
                   <Check className="w-4 h-4" /> Generate My Plan
@@ -285,6 +365,19 @@ function StepBody({ formData, updateField }) {
             />
           </div>
         </div>
+        <div>
+          <label className="block text-sm font-medium text-muted mb-1.5">Country</label>
+          <select
+            className="input-field"
+            value={formData.country}
+            onChange={(e) => updateField('country', e.target.value)}
+          >
+            <option value="">Select your country</option>
+            {COUNTRIES.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
       </div>
     </div>
   );
@@ -354,6 +447,30 @@ function StepWorkout({ formData, updateField, toggleArrayField }) {
         ))}
       </div>
 
+      <p className="text-sm font-semibold text-muted mb-3">💪 Your strong body parts (optional)</p>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {MUSCLE_GROUPS.map((mg) => (
+          <ChipButton
+            key={`str-${mg}`}
+            selected={formData.strengthParts.includes(mg)}
+            onClick={() => toggleArrayField('strengthParts', mg)}
+            label={mg}
+          />
+        ))}
+      </div>
+
+      <p className="text-sm font-semibold text-muted mb-3">🎯 Weak parts to improve (optional)</p>
+      <div className="flex flex-wrap gap-2 mb-6">
+        {MUSCLE_GROUPS.map((mg) => (
+          <ChipButton
+            key={`wk-${mg}`}
+            selected={formData.weaknessParts.includes(mg)}
+            onClick={() => toggleArrayField('weaknessParts', mg)}
+            label={mg}
+          />
+        ))}
+      </div>
+
       {formData.workoutPreference === 'home' && (
         <>
           <p className="text-sm font-semibold text-muted mb-3">Available equipment</p>
@@ -373,13 +490,13 @@ function StepWorkout({ formData, updateField, toggleArrayField }) {
   );
 }
 
-function StepDiet({ formData, updateField }) {
+function StepDiet({ formData, updateField, toggleArrayField }) {
   return (
     <div>
       <h2 className="text-3xl font-heading font-bold text-[var(--text-main)] mb-2">
-        Diet preference
+        Diet & Health
       </h2>
-      <p className="text-muted mb-6">What's your dietary preference?</p>
+      <p className="text-muted mb-6">Your dietary preferences and health information</p>
 
       <div className="grid grid-cols-2 gap-3 mb-8">
         {DIET_PREFERENCES.map((dp) => (
@@ -412,7 +529,7 @@ function StepDiet({ formData, updateField }) {
         </div>
       </div>
 
-      <div>
+      <div className="mb-6">
         <label className="block text-sm font-semibold text-muted mb-1.5">
           Allergies (comma separated, optional)
         </label>
@@ -422,6 +539,39 @@ function StepDiet({ formData, updateField }) {
           placeholder="e.g. peanuts, dairy"
           value={formData.allergies}
           onChange={(e) => updateField('allergies', e.target.value)}
+        />
+      </div>
+
+      <div className="mb-6">
+        <p className="text-sm font-semibold text-muted mb-3">🏥 Medical conditions (optional)</p>
+        <p className="text-xs text-dim mb-3">
+          Select any conditions so we can create a safe diet plan for you
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {MEDICAL_CONDITIONS.map((condition) => (
+            <ChipButton
+              key={condition}
+              selected={formData.medicalConditions.includes(condition)}
+              onClick={() => toggleArrayField('medicalConditions', condition)}
+              label={condition}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-muted mb-1.5">
+          📝 Custom workout description (optional)
+        </label>
+        <p className="text-xs text-dim mb-2">
+          Describe any specific requirements, e.g. "I want to train legs 3 times a week" or mention any problems
+        </p>
+        <textarea
+          className="input-field resize-none"
+          rows={3}
+          placeholder="e.g. I want to focus on legs 3x per week, I have knee pain sometimes..."
+          value={formData.customDescription}
+          onChange={(e) => updateField('customDescription', e.target.value)}
         />
       </div>
     </div>

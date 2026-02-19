@@ -45,3 +45,23 @@ export const BUDGETS = [
   { value: 'medium', label: 'Moderate', description: '$$' },
   { value: 'high', label: 'Premium', description: '$$$' },
 ];
+
+export const COUNTRIES = [
+  'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
+  'Germany', 'France', 'Brazil', 'Japan', 'South Korea',
+  'China', 'Mexico', 'Italy', 'Spain', 'Russia',
+  'South Africa', 'Nigeria', 'Saudi Arabia', 'UAE', 'Indonesia',
+  'Thailand', 'Vietnam', 'Philippines', 'Pakistan', 'Bangladesh',
+  'Egypt', 'Turkey', 'Argentina', 'Colombia', 'Other',
+];
+
+export const MUSCLE_GROUPS = [
+  'Chest', 'Back', 'Shoulders', 'Biceps', 'Triceps',
+  'Forearms', 'Quadriceps', 'Hamstrings', 'Glutes', 'Calves', 'Core',
+];
+
+export const MEDICAL_CONDITIONS = [
+  'Diabetes', 'Hypertension', 'Heart Disease', 'Kidney Disease', 
+  'Thyroid Issues', 'High Cholesterol', 'PCOS', 'Arthritis', 
+  'Osteoporosis', 'Asthma', 'IBS', 'Celiac Disease', 'None'
+];

@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { LogOut, Sun, Moon, Dumbbell } from 'lucide-react';
+import { LogOut, Sun, Moon, Dumbbell, Bug } from 'lucide-react';
 import Sidebar from './Sidebar';
 import MobileNav from './MobileNav';
 import { logout } from '../../store/slices/authSlice';
 import { useTheme } from '../../context/ThemeContext';
+import FeedbackModal from '../FeedbackModal';
+import ChatWidget from '../ChatWidget';
 
 export default function DashboardLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   // Simple title mapping
   const getTitle = () => {
@@ -29,7 +33,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="flex min-h-screen bg-bg transition-colors duration-300">
-      <Sidebar />
+      <Sidebar onFeedbackClick={() => setFeedbackOpen(true)} />
       <main className="flex-1 ml-0 md:ml-[72px] pb-24 md:pb-10"> {/* Added bottom padding for mobile nav */}
         
         {/* Mobile Header */}
@@ -43,6 +47,13 @@ export default function DashboardLayout() {
              </span>
           </div>
           <div className="flex items-center gap-2">
+            <button
+               onClick={() => setFeedbackOpen(true)}
+               className="p-2 rounded-lg text-dim hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
+               title="Report Bug / Suggest Feature"
+            >
+              <Bug className="w-5 h-5" />
+            </button>
             <button
                onClick={toggleTheme}
                className="p-2 rounded-lg text-dim hover:bg-surface-light/50 transition-colors"
@@ -63,6 +74,12 @@ export default function DashboardLayout() {
         </div>
       </main>
       <MobileNav />
+
+      {/* Feedback Modal */}
+      <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+
+      {/* AI Coach Chatbot */}
+      <ChatWidget />
     </div>
   );
 }

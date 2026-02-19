@@ -24,6 +24,30 @@ router.post('/generate', auth, async (req, res) => {
     // Generate via Groq AI
     const aiPlan = await generateFitnessPlan(profile);
 
+    // ── Validate & recalculate macroGoals from actual diet items ──
+    // Sum up the first option of each meal to ensure macroGoals match
+    if (aiPlan.dietPlan && aiPlan.dietPlan.length > 0) {
+      let totalCalories = 0, totalProtein = 0, totalCarbs = 0, totalFats = 0;
+
+      for (const meal of aiPlan.dietPlan) {
+        const option = meal.options?.[0];
+        if (option) {
+          totalCalories += Number(option.calories) || 0;
+          totalProtein += Number(option.protein) || 0;
+          totalCarbs += Number(option.carbs) || 0;
+          totalFats += Number(option.fats) || 0;
+        }
+      }
+
+      // Override AI macroGoals with calculated values for consistency
+      aiPlan.macroGoals = {
+        dailyCalories: totalCalories,
+        protein: totalProtein,
+        carbs: totalCarbs,
+        fats: totalFats,
+      };
+    }
+
     // Save new plan
     const plan = await Plan.create({
       user: req.user._id,

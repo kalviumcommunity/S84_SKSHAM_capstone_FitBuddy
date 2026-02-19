@@ -1,23 +1,41 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { planAPI } from '../../services/api';
 
-export const generatePlan = createAsyncThunk('plan/generate', async (_, { rejectWithValue }) => {
-  try {
-    const res = await planAPI.generate();
-    return res.data.plan;
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.message || 'Failed to generate plan');
+export const generatePlan = createAsyncThunk(
+  'plan/generate',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await planAPI.generate();
+      return res.data.plan;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed to generate plan');
+    }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { plan } = getState();
+      if (plan.generating) return false;
+    },
   }
-});
+);
 
-export const fetchCurrentPlan = createAsyncThunk('plan/fetchCurrent', async (_, { rejectWithValue }) => {
-  try {
-    const res = await planAPI.getCurrent();
-    return res.data.plan;
-  } catch (err) {
-    return rejectWithValue(err.response?.data?.message || 'No active plan');
+export const fetchCurrentPlan = createAsyncThunk(
+  'plan/fetchCurrent',
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await planAPI.getCurrent();
+      return res.data.plan;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'No active plan');
+    }
+  },
+  {
+    condition: (_, { getState }) => {
+      const { plan } = getState();
+      if (plan.loading) return false;
+    },
   }
-});
+);
 
 const planSlice = createSlice({
   name: 'plan',

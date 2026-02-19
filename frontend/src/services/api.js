@@ -45,6 +45,7 @@ export const authAPI = {
 export const profileAPI = {
   get: () => api.get('/profile'),
   update: (data) => api.put('/profile', data),
+  uploadAvatar: (avatar) => api.put('/profile/avatar', { avatar }),
 };
 
 // Plan
@@ -59,6 +60,19 @@ export const trackerAPI = {
   toggleExercise: (data) => api.post('/tracker/exercise', data),
   toggleMeal: (data) => api.post('/tracker/meal', data),
   updateWater: (data) => api.post('/tracker/water', data),
+};
+
+// Feedback
+export const feedbackAPI = {
+  reportBug: (data) => api.post('/feedback/bug', data),
+  suggestFeature: (data) => api.post('/feedback/feature', data),
+};
+
+// Chat
+export const chatAPI = {
+  getHistory: () => api.get('/chat'),
+  sendMessage: (message) => api.post('/chat', { message }),
+  clearHistory: () => api.delete('/chat'),
 };
 
 export default api;

@@ -18,7 +18,7 @@ import Profile from './pages/Profile';
 import DashboardLayout from './components/layout/DashboardLayout';
 
 function ProtectedRoute({ children }) {
-  const { isAuthenticated, token, loading } = useSelector((s) => s.auth);
+  const { isAuthenticated, token, loading, user } = useSelector((s) => s.auth);
 
   if (!token) return <Navigate to="/login" replace />;
   if (loading) {
@@ -29,6 +29,10 @@ function ProtectedRoute({ children }) {
     );
   }
   if (!isAuthenticated) return <Navigate to="/login" replace />;
+  // Redirect to setup if profile not complete (except if already on /setup)
+  if (user && !user.profileComplete && window.location.pathname !== '/setup') {
+    return <Navigate to="/setup" replace />;
+  }
   return children;
 }
 

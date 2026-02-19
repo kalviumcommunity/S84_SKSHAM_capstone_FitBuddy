@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { authAPI } from '../../services/api';
+import { authAPI, profileAPI } from '../../services/api';
 
 export const signup = createAsyncThunk('auth/signup', async (data, { rejectWithValue }) => {
   try {
@@ -38,6 +38,15 @@ export const loadUser = createAsyncThunk('auth/loadUser', async (_, { rejectWith
   } catch (err) {
     localStorage.removeItem('fitbuddy-token');
     return rejectWithValue('Not authenticated');
+  }
+});
+
+export const uploadAvatar = createAsyncThunk('auth/uploadAvatar', async (base64, { rejectWithValue }) => {
+  try {
+    const res = await profileAPI.uploadAvatar(base64);
+    return res.data.user;
+  } catch (err) {
+    return rejectWithValue(err.response?.data?.message || 'Avatar upload failed');
   }
 });
 
@@ -111,6 +120,10 @@ const authSlice = createSlice({
       state.user = null;
       state.isAuthenticated = false;
       state.token = null;
+    });
+    // Upload Avatar
+    builder.addCase(uploadAvatar.fulfilled, (state, action) => {
+      state.user = action.payload;
     });
   },
 });

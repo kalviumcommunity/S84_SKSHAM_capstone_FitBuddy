@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { Dumbbell, Zap, Target, TrendingUp, ArrowRight, ChevronRight, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
@@ -32,6 +33,7 @@ const features = [
 
 export default function Landing() {
   const { theme, toggleTheme } = useTheme();
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   return (
     <div className="min-h-screen bg-bg text-[var(--text-main)] overflow-hidden transition-colors duration-300">
@@ -58,17 +60,19 @@ export default function Landing() {
                   <Moon className="w-5 h-5" />
                 )}
               </button>
+              {!isAuthenticated && (
+                <Link
+                  to="/login"
+                  className="text-sm font-medium text-dim hover:text-[var(--text-main)] transition-colors px-2 sm:px-4 py-2"
+                >
+                  Log In
+                </Link>
+              )}
               <Link
-                to="/login"
-                className="text-sm font-medium text-dim hover:text-[var(--text-main)] transition-colors px-2 sm:px-4 py-2"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/signup"
+                to={isAuthenticated ? "/dashboard" : "/signup"}
                 className="bg-accent hover:bg-accent-hover text-white font-semibold text-sm px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl transition-all shadow-glow hover:shadow-glow-lg"
               >
-                Get Started
+                {isAuthenticated ? "Dashboard" : "Get Started"}
               </Link>
             </div>
           </div>
@@ -111,17 +115,19 @@ export default function Landing() {
 
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-4">
             <Link
-              to="/signup"
+              to={isAuthenticated ? "/dashboard" : "/signup"}
               className="bg-accent hover:bg-accent-hover text-white font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center gap-2 shadow-glow hover:shadow-glow-lg transition-all"
             >
-              Start Free <ArrowRight className="w-5 h-5" />
+              {isAuthenticated ? "Track Your Progress" : "Start Free"} <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link
-              to="/login"
-              className="bg-surface-light hover:bg-surface-hover text-[var(--text-main)] font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all"
-            >
-              Log In
-            </Link>
+            {!isAuthenticated && (
+              <Link
+                to="/login"
+                className="bg-surface-light hover:bg-surface-hover text-[var(--text-main)] font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all"
+              >
+                Log In
+              </Link>
+            )}
           </motion.div>
         </motion.div>
       </section>
