@@ -20,7 +20,10 @@ const mealOptionSchema = new mongoose.Schema({
   protein: { type: Number },
   carbs: { type: Number },
   fats: { type: Number },
-  ingredients: [{ type: String }],
+  ingredients: [{
+    name: { type: String },
+    quantity: { type: String }
+  }],
   quantity: { type: String },  // e.g. "150g", "2 cups", "1 medium bowl"
   contraindications: [{ type: String }],  // e.g. ["diabetes", "hypertension", "kidney disease"]
 }, { _id: false });

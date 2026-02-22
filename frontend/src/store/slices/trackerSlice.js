@@ -60,6 +60,30 @@ export const toggleMeal = createAsyncThunk(
   }
 );
 
+export const addActualMeal = createAsyncThunk(
+  'tracker/addActualMeal',
+  async (data, { rejectWithValue }) => {
+    try {
+      const res = await trackerAPI.addActualMeal(data);
+      return res.data.log;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed');
+    }
+  }
+);
+
+export const removeActualMeal = createAsyncThunk(
+  'tracker/removeActualMeal',
+  async ({ date, mealId }, { rejectWithValue }) => {
+    try {
+      const res = await trackerAPI.removeActualMeal(date, mealId);
+      return res.data.log;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || 'Failed');
+    }
+  }
+);
+
 export const updateWater = createAsyncThunk(
   'tracker/updateWater',
   async (data, { rejectWithValue }) => {
@@ -146,6 +170,22 @@ const trackerSlice = createSlice({
       }
     });
     builder.addCase(toggleMeal.rejected, (state, action) => {
+      state.error = action.payload;
+    });
+
+    // ── Actual Meals ──
+    builder.addCase(addActualMeal.fulfilled, (state, action) => {
+      state.dailyLog = action.payload;
+    });
+    builder.addCase(addActualMeal.rejected, (state, action) => {
+      console.error('addActualMeal rejected:', action.payload);
+      state.error = action.payload;
+    });
+    builder.addCase(removeActualMeal.fulfilled, (state, action) => {
+      state.dailyLog = action.payload;
+    });
+    builder.addCase(removeActualMeal.rejected, (state, action) => {
+      console.error('removeActualMeal rejected:', action.payload);
       state.error = action.payload;
     });
 

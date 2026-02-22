@@ -76,8 +76,8 @@ ${isStandardAge ? `1. Create a 6-day workout plan (Monday-Saturday, Sunday is re
 2. Each day should have a themed activity session.
 3. Include 3-5 activities per day with sets, reps/duration, restTime, and notes.`}
 4. Create a diet plan with exactly 4 meals: Breakfast, Lunch, Dinner, Snack.
-5. Each meal MUST have 1-2 options. Each option MUST include: "name", "calories" (number), "protein" (number), "carbs" (number), "fats" (number), "ingredients" (array of strings), "quantity" (string, e.g. "200g", "1 cup", "2 large eggs"), and "contraindications" (array of strings).
-6. CRITICAL: The "quantity" field is MANDATORY for every meal option. Be specific about serving sizes.
+5. Each meal MUST have 1-2 options. Each option MUST include: "name", "calories" (number), "protein" (number), "carbs" (number), "fats" (number), "ingredients" (array of objects with "name" and "quantity", e.g. [{"name": "oats", "quantity": "50g"}]), "quantity" (string for the total meal size, e.g. "1 bowl"), and "contraindications" (array of strings).
+6. CRITICAL: The "quantity" field at both meal level and ingredient level is MANDATORY. Be specific about serving sizes and measurement for each ingredient so the user knows exactly how much to cook.
 7. Calculate daily macro goals (protein, carbs, fats, total daily calories). Use ONLY numbers for calorie and macro values.
 8. CRITICAL: The macroGoals values MUST exactly equal the sum of ONE option from each of the 4 meals. Add up the calories, protein, carbs, and fats from one option per meal and use those sums as your macroGoals. They MUST match.
 9. Respect the user's dietary preference and allergies strictly.
@@ -105,8 +105,13 @@ You MUST respond with ONLY valid JSON in this exact structure (no markdown, no t
           "protein": 15, 
           "carbs": 50, 
           "fats": 8, 
-          "ingredients": ["oats", "berries", "honey", "milk"],
-          "quantity": "1 bowl (150g oats)",
+          "ingredients": [
+            { "name": "rolled oats", "quantity": "50g" },
+            { "name": "blueberries", "quantity": "1/2 cup" },
+            { "name": "honey", "quantity": "1 tbsp" },
+            { "name": "milk", "quantity": "200ml" }
+          ],
+          "quantity": "1 bowl (approx 400g)",
           "contraindications": ["gluten sensitivity"]
         }
       ]
@@ -193,5 +198,54 @@ export const generateFitnessPlan = async (profile) => {
     }
 
     throw error;
+  }
+};
+
+export const estimateMacros = async (foodDescription) => {
+  try {
+    console.log('Estimating macros for:', foodDescription);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: 'system',
+          content: 'You are a nutrition expert. Estimate the nutritional content for a given food description. Respond with a JSON object containing calories, protein, carbs, and fats. Use numbers only. If multiple options exist, give a common average for a single serving.',
+        },
+        {
+          role: 'user',
+          content: `Estimate nutrition for: "${foodDescription}". Return JSON with exactly these keys (lowercase): calories, protein, carbs, fats.`,
+        },
+      ],
+      model: 'llama-3.3-70b-versatile',
+      temperature: 0.3,
+      response_format: { type: 'json_object' },
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    console.log('Groq raw response for estimation:', content);
+    
+    const parsed = typeof content === 'string' ? JSON.parse(content) : content;
+    
+    // Normalize keys to lowercase just in case
+    const normalized = {};
+    Object.keys(parsed).forEach(key => {
+      normalized[key.toLowerCase()] = parsed[key];
+    });
+
+    const getFirstNumber = (val) => {
+      if (typeof val === 'number') return val;
+      if (typeof val !== 'string') return 0;
+      const match = val.match(/(\d+(\.\d+)?)/);
+      return match ? parseFloat(match[0]) : 0;
+    };
+
+    return {
+      calories: getFirstNumber(normalized.calories) || getFirstNumber(normalized.energy) || 0,
+      protein: getFirstNumber(normalized.protein) || 0,
+      carbs: getFirstNumber(normalized.carbs) || getFirstNumber(normalized.carbohydrates) || 0,
+      fats: getFirstNumber(normalized.fats) || getFirstNumber(normalized.fat) || 0,
+    };
+  } catch (error) {
+    console.error('Macro estimation error in groqService:', error);
+    return { calories: 0, protein: 0, carbs: 0, fats: 0 };
   }
 };

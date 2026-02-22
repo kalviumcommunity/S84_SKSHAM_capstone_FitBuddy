@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Bug, Lightbulb, Send } from 'lucide-react';
 import { Button } from './ui';
 import toast from 'react-hot-toast';
+import { sendEmail } from '../utils/email';
 import { feedbackAPI } from '../services/api';
 
 export default function FeedbackModal({ isOpen, onClose }) {
+  const { user } = useSelector((state) => state.auth);
   const [tab, setTab] = useState('bug'); // 'bug' | 'feature'
   const [subject, setSubject] = useState('');
   const [description, setDescription] = useState('');
@@ -20,17 +23,29 @@ export default function FeedbackModal({ isOpen, onClose }) {
 
     setSending(true);
     try {
+      // 1. Send to EmailJS - Matching your template placeholders
+      const templateParams = {
+        to_name: "FitBuddy Admin",
+        name: user?.name || "Anonymous User",
+        email: user?.email || "No Email",
+        message: `Type: ${tab === 'bug' ? 'BUG REPORT' : 'FEATURE SUGGESTION'}\nSubject: ${subject}\n\nDescription:\n${description}`,
+      };
+
+      await sendEmail(templateParams);
+
+      // 2. Save to DB (optional backup)
       if (tab === 'bug') {
         await feedbackAPI.reportBug({ subject, description });
-        toast.success('Bug report sent! Thank you.');
+        toast.success('Bug report sent to developer! Thank you.');
       } else {
         await feedbackAPI.suggestFeature({ subject, description });
-        toast.success('Feature suggestion sent! Thank you.');
+        toast.success('Feature suggestion sent to developer! Thank you.');
       }
       setSubject('');
       setDescription('');
       onClose();
-    } catch {
+    } catch (err) {
+      console.error('Feedback error:', err);
       toast.error('Failed to send. Please try again.');
     } finally {
       setSending(false);
@@ -58,7 +73,7 @@ export default function FeedbackModal({ isOpen, onClose }) {
             {/* Header */}
             <div className="flex items-center justify-between p-5 border-b border-surface-border">
               <h2 className="font-heading font-bold text-lg text-[var(--text-main)] uppercase tracking-wide">
-                Feedback
+                {tab === 'bug' ? 'Report a Bug' : 'Suggest Feature'}
               </h2>
               <button
                 onClick={onClose}

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send, Trash2, Bot, User, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 import { chatAPI } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -181,12 +182,25 @@ export default function ChatWidget() {
                   </div>
 
                   {/* Bubble */}
-                  <div className={`max-w-[80%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed whitespace-pre-wrap ${
+                  <div className={`max-w-[80%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-accent text-white rounded-tr-sm'
                       : 'bg-surface-light/60 text-[var(--text-main)] rounded-tl-sm border border-surface-border'
                   }`}>
-                    {msg.content}
+                    <ReactMarkdown
+                      components={{
+                        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2" {...props} />,
+                        ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2" {...props} />,
+                        li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                        strong: ({ node, ...props }) => (
+                          <strong className={`font-bold ${msg.role === 'assistant' ? 'text-accent' : 'text-white'}`} {...props} />
+                        ),
+                        a: ({ node, ...props }) => <a className="text-accent underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
                   </div>
                 </motion.div>
               ))}

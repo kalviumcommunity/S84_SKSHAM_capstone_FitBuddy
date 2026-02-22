@@ -59,6 +59,8 @@ export const trackerAPI = {
   getByDate: (date) => api.get(`/tracker/${date}`),
   toggleExercise: (data) => api.post('/tracker/exercise', data),
   toggleMeal: (data) => api.post('/tracker/meal', data),
+  addActualMeal: (data) => api.post('/tracker/actual-meal', data),
+  removeActualMeal: (date, mealId) => api.delete(`/tracker/actual-meal/${date}/${mealId}`),
   updateWater: (data) => api.post('/tracker/water', data),
 };
 

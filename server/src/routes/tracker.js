@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import DailyLog from '../models/DailyLog.js';
 import auth from '../middleware/auth.js';
+import { estimateMacros } from '../services/groqService.js';
 
 const router = Router();
 
@@ -25,7 +26,6 @@ router.get('/:date', auth, async (req, res) => {
     const log = await getOrCreateLog(req.user._id, req.params.date);
     res.json({ log });
   } catch (error) {
-    console.error('Fetch daily log error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -46,7 +46,6 @@ router.post('/exercise', auth, async (req, res) => {
     await log.save();
     res.json({ log });
   } catch (error) {
-    console.error('Toggle exercise error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -67,7 +66,61 @@ router.post('/meal', auth, async (req, res) => {
     await log.save();
     res.json({ log });
   } catch (error) {
-    console.error('Toggle meal error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// POST /api/tracker/actual-meal
+router.post('/actual-meal', auth, async (req, res) => {
+  try {
+    const { date, meal: mealData } = req.body;
+    let meal = { ...mealData }; // Clone to avoid direct mutation
+    const log = await getOrCreateLog(req.user._id, date);
+
+    // Normalize incoming numbers
+    meal.calories = Number(meal.calories) || 0;
+    meal.protein = Number(meal.protein) || 0;
+    meal.carbs = Number(meal.carbs) || 0;
+    meal.fats = Number(meal.fats) || 0;
+
+
+
+    // If all macros are 0, request AI estimation
+    if (meal.calories === 0 && meal.protein === 0 && meal.carbs === 0 && meal.fats === 0) {
+      try {
+        const estimation = await estimateMacros(meal.name);
+        
+        meal.calories = estimation.calories || 0;
+        meal.protein = estimation.protein || 0;
+        meal.carbs = estimation.carbs || 0;
+        meal.fats = estimation.fats || 0;
+      } catch (estError) {
+        // Silent fail for estimation
+      }
+    }
+
+    log.actualMeals.push(meal);
+    await log.save();
+
+    res.json({ log });
+  } catch (error) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// DELETE /api/tracker/actual-meal/:id
+router.delete('/actual-meal/:date/:mealId', auth, async (req, res) => {
+  try {
+    const { date, mealId } = req.params;
+    const log = await DailyLog.findOne({ user: req.user._id, date });
+    if (!log) return res.status(404).json({ message: 'Log not found' });
+
+    log.actualMeals = log.actualMeals.filter(m => m._id.toString() !== mealId);
+    await log.save();
+
+    res.json({ log });
+  } catch (error) {
+    console.error('Delete actual meal error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -84,7 +137,6 @@ router.post('/water', auth, async (req, res) => {
 
     res.json({ log });
   } catch (error) {
-    console.error('Update water error:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });

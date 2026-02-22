@@ -123,9 +123,6 @@ function normalizeLabel(s) {
 }
 
 export default function BodyVisualization2D({ strengthParts = [], weaknessParts = [] }) {
-  // Debug logging
-  console.log('BodyVisualization2D props:', { strengthParts, weaknessParts });
-  
   const strengthSet = useMemo(
     () => new Set((strengthParts || []).map(normalizeLabel)),
     [strengthParts],
@@ -134,11 +131,6 @@ export default function BodyVisualization2D({ strengthParts = [], weaknessParts 
     () => new Set((weaknessParts || []).map(normalizeLabel)),
     [weaknessParts],
   );
-
-  console.log('Normalized sets:', { 
-    strengthSet: Array.from(strengthSet), 
-    weaknessSet: Array.from(weaknessSet) 
-  });
 
   const getColor = (label) => {
     const key = normalizeLabel(label);

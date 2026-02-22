@@ -20,15 +20,21 @@ import DashboardLayout from './components/layout/DashboardLayout';
 function ProtectedRoute({ children }) {
   const { isAuthenticated, token, loading, user } = useSelector((s) => s.auth);
 
-  if (!token) return <Navigate to="/login" replace />;
-  if (loading) {
+  // Show loading state while checking authentication
+  if (loading || (!token && !isAuthenticated)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg">
-        <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin" />
+        <div className="text-center space-y-4">
+          <div className="w-10 h-10 border-4 border-accent border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-muted">Verifying access...</p>
+        </div>
       </div>
     );
   }
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  
+  // Not authenticated - redirect to login
+  if (!token || !isAuthenticated) return <Navigate to="/login" replace />;
+  
   // Redirect to setup if profile not complete (except if already on /setup)
   if (user && !user.profileComplete && window.location.pathname !== '/setup') {
     return <Navigate to="/setup" replace />;
@@ -84,8 +90,21 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
           </Route>
 
-          {/* Fallback */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* Fallback - 404 Page */}
+          <Route path="*" element={
+            <div className="min-h-screen flex items-center justify-center bg-bg">
+              <div className="text-center space-y-4">
+                <h1 className="text-4xl font-bold text-accent">404</h1>
+                <p className="text-lg text-muted">Page not found</p>
+                <button 
+                  onClick={() => window.location.href = '/'}
+                  className="mt-6 px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
+                >
+                  Go Home
+                </button>
+              </div>
+            </div>
+          } />
         </Routes>
       </AnimatePresence>
     </>
