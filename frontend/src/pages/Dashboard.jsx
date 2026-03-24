@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Flame, Droplets, Plus, Minus, Check, ChevronRight, Trophy, Dumbbell,
-  Utensils, Target, TrendingUp, Zap, Activity, Coffee, Sun, Moon, Cookie, Trash2, Clock
+  Utensils, Target, TrendingUp, Zap, Activity, Trash2, Clock
 } from 'lucide-react';
 import { MotionCard, ProgressRing, ProgressBar, Skeleton, Badge, Input, Button } from '../components/ui';
 import PageWrapper from '../components/layout/PageWrapper';
@@ -36,6 +36,8 @@ export default function Dashboard() {
   const [newMealFats, setNewMealFats] = useState('');
   const [showMealForm, setShowMealForm] = useState(false);
   const [isEstimating, setIsEstimating] = useState(false);
+  const [expandedMeals, setExpandedMeals] = useState({});
+  const [expandedWorkouts, setExpandedWorkouts] = useState({});
 
   useEffect(() => {
     dispatch(fetchCurrentPlan());
@@ -420,35 +422,68 @@ export default function Dashboard() {
                 <div className="space-y-3">
                   {todayWorkout.exercises.map((ex, i) => {
                     const isDone = dailyLog?.completedExercises?.includes(ex.name);
+                    const isExpanded = expandedWorkouts[ex.name];
                     return (
-                      <motion.button
+                      <motion.div
                         key={i}
                         whileTap={{ scale: 0.985 }}
                         transition={{ duration: 0.08 }}
-                        onClick={() => handleToggleExercise(ex.name)}
-                        className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-100 text-left group ${
+                        onClick={() => setExpandedWorkouts(prev => ({ ...prev, [ex.name]: !prev[ex.name] }))}
+                        onDoubleClick={() => handleToggleExercise(ex.name)}
+                        className={`w-full select-none cursor-pointer flex flex-col gap-3 p-4 rounded-xl border transition-all duration-100 text-left group ${
                           isDone
                             ? 'bg-accent/5 border-accent/20'
                             : 'bg-surface-light/30 border-surface-border hover:border-surface-hover'
                         }`}
                       >
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
-                          isDone ? 'bg-accent text-white' : 'bg-surface-light text-dim group-hover:text-[var(--text-main)]'
-                        }`}>
-                          {isDone ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{i + 1}</span>}
+                        <div className="flex items-center gap-4 w-full">
+                          <button
+                            type="button"
+                            onClick={(e) => { e.stopPropagation(); handleToggleExercise(ex.name); }}
+                            className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                              isDone ? 'bg-accent text-white' : 'bg-surface-light text-dim group-hover:text-[var(--text-main)] hover:bg-surface-hover hover:scale-105'
+                            }`}
+                          >
+                            {isDone ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{i + 1}</span>}
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-semibold text-sm ${isDone ? 'text-accent line-through opacity-70' : 'text-[var(--text-main)]'}`}>
+                              {ex.name}
+                            </p>
+                            <p className="text-xs text-dim">
+                              {ex.sets} sets × {ex.reps} reps
+                            </p>
+                          </div>
+                          <ChevronRight className={`w-4 h-4 text-surface-light group-hover:text-muted flex-shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <p className={`font-semibold text-sm ${isDone ? 'text-accent line-through opacity-70' : 'text-[var(--text-main)]'}`}>
-                            {ex.name}
-                          </p>
-                          <p className="text-xs text-dim">
-                            {ex.sets} sets × {ex.reps} reps
-                            {ex.restTime && ` · Rest: ${ex.restTime}`}
-                            {ex.notes && ` · ${ex.notes}`}
-                          </p>
-                        </div>
-                        <ChevronRight className="w-4 h-4 text-surface-light group-hover:text-muted flex-shrink-0 transition-colors" />
-                      </motion.button>
+                        
+                        {/* Expanded Details */}
+                        <AnimatePresence>
+                          {isExpanded && (
+                            <motion.div 
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: 'auto', opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="ml-12 w-[calc(100%-3rem)] border-t border-surface-border pt-3 overflow-hidden"
+                            >
+                              {(ex.restTime || ex.notes) && <p className="text-[10px] font-bold text-dim uppercase tracking-widest mb-1.5">Details</p>}
+                              {ex.restTime && (
+                                <p className="text-xs text-muted mb-1">
+                                  <span className="font-medium text-dim">Rest:</span> {ex.restTime}
+                                </p>
+                              )}
+                              {ex.notes && (
+                                <p className="text-xs text-muted">
+                                  <span className="font-medium text-dim">Notes:</span> {ex.notes}
+                                </p>
+                              )}
+                              <p className="text-[10px] text-dim mt-3 italic text-center opacity-70">
+                                Double-click to mark as {isDone ? 'incomplete' : 'done'}
+                              </p>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </motion.div>
                     );
                   })}
                 </div>
@@ -578,82 +613,82 @@ export default function Dashboard() {
                       const option = meal.options?.[0];
                       const mealKey = `${meal.mealType}-${option?.name || i}`;
                       const isDone = dailyLog?.mealsConsumed?.includes(mealKey);
-                      const mealIcons = { breakfast: Coffee, lunch: Sun, dinner: Moon, snack: Cookie };
-                      const MealIcon = mealIcons[meal.mealType?.toLowerCase()] || Utensils;
+                      const isExpanded = expandedMeals[mealKey];
+                      
                       return (
                         <div key={i} className="space-y-2">
-                          <motion.button
+                          <motion.div
                             whileTap={{ scale: 0.985 }}
                             transition={{ duration: 0.08 }}
-                            onClick={() => handleToggleMeal(mealKey)}
-                            className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all duration-100 text-left group ${
+                            onClick={() => setExpandedMeals(prev => ({ ...prev, [mealKey]: !prev[mealKey] }))}
+                            onDoubleClick={() => handleToggleMeal(mealKey)}
+                            className={`w-full select-none cursor-pointer flex flex-col gap-3 p-4 rounded-xl border transition-all duration-100 text-left group ${
                               isDone
                                 ? 'bg-emerald/5 border-emerald/20'
                                 : 'bg-surface-light/30 border-surface-border hover:border-surface-hover'
                             }`}
                           >
-                            <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
-                              isDone ? 'bg-emerald text-white' : 'bg-surface-light text-dim'
-                            }`}>
-                              {isDone ? <Check className="w-4 h-4" /> : <MealIcon className="w-3.5 h-3.5" />}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[10px] font-bold text-dim uppercase tracking-widest">
-                                {meal.mealType}
-                              </p>
-                              <p className={`font-semibold text-sm mt-0.5 ${isDone ? 'text-emerald line-through opacity-70' : 'text-[var(--text-main)]'}`}>
-                                {option?.name || 'Meal option'}
-                              </p>
-                              <div className="mt-1.5 space-y-2">
-                                <div className="flex items-center gap-2">
-                                  {option.quantity ? (
-                                    <span className="inline-flex items-center gap-1 bg-amber/15 px-3 py-1.5 rounded-lg border border-amber/30">
-                                      <span className="text-xs font-bold text-amber">Qty:</span>
-                                      <span className="text-sm font-bold text-amber">{option.quantity}</span>
-                                    </span>
-                                  ) : (
-                                    <span className="inline-flex items-center gap-1 bg-amber/15 px-3 py-1.5 rounded-lg border border-amber/30">
-                                      <span className="text-xs font-bold text-amber">Qty:</span>
-                                      <span className="text-sm font-bold text-amber">--</span>
-                                    </span>
-                                  )}
-                                  {option.calories != null && (
-                                    <span className="text-lg font-bold text-accent">
-                                      {option.calories} kcal
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-[10px] text-dim font-medium flex flex-wrap gap-1.5">
-                                  <span className="inline-block bg-surface-light/50 px-2.5 py-1 rounded-md">P: {option.protein ?? 0}g</span>
-                                  <span className="inline-block bg-surface-light/50 px-2.5 py-1 rounded-md">C: {option.carbs ?? 0}g</span>
-                                  <span className="inline-block bg-surface-light/50 px-2.5 py-1 rounded-md">F: {option.fats ?? 0}g</span>
-                                </p>
-                              </div>
-                              {option?.contraindications?.length > 0 && (
-                                <p className="text-[10px] text-accent font-bold mt-1 uppercase tracking-wider flex items-center gap-1">
-                                  <span>⚠️ Avoid if:</span> <span className="opacity-80">{option.contraindications.join(', ')}</span>
-                                </p>
-                              )}
-                            </div>
-                          </motion.button>
-                          
-                          {/* Ingredients display (New) */}
-                          <AnimatePresence>
-                            {!isDone && option?.ingredients?.length > 0 && (
-                              <motion.div 
-                                initial={{ opacity: 0, y: -5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="ml-12 grid grid-cols-1 gap-1.5 pl-4 border-l-2 border-emerald/10"
+                            <div className="flex items-center gap-4 w-full">
+                              <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); handleToggleMeal(mealKey); }}
+                                className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  isDone ? 'bg-emerald text-white' : 'bg-surface-light text-dim group-hover:text-[var(--text-main)] hover:bg-surface-hover hover:scale-105'
+                                }`}
                               >
-                                {option.ingredients.map((ing, idx) => (
-                                  <div key={idx} className="flex justify-between items-center text-[11px] text-muted">
-                                    <span className="capitalize">{typeof ing === 'string' ? ing : ing.name}</span>
-                                    <span className="font-medium text-dim">{typeof ing === 'string' ? '' : ing.quantity}</span>
-                                  </div>
-                                ))}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
+                                {isDone ? <Check className="w-4 h-4" /> : <span className="text-xs font-bold">{i + 1}</span>}
+                              </button>
+                              
+                              <div className="flex-1 min-w-0">
+                                <p className="flex items-center gap-2 mb-0.5">
+                                  <span className="text-[10px] font-bold text-dim uppercase tracking-widest leading-none mt-0.5">{meal.mealType}</span>
+                                  <span className={`font-semibold text-sm truncate ${isDone ? 'text-emerald line-through opacity-70' : 'text-[var(--text-main)]'}`}>
+                                    {option?.name || 'Meal option'}
+                                  </span>
+                                </p>
+                                <p className="text-xs text-dim truncate">
+                                  {option?.quantity ? `Qty: ${option.quantity} · ` : ''}
+                                  {option?.calories != null ? `${option.calories} kcal · ` : ''}
+                                  P: {option?.protein ?? 0}g · C: {option?.carbs ?? 0}g · F: {option?.fats ?? 0}g
+                                </p>
+                                {option?.contraindications?.length > 0 && (
+                                  <p className="text-[10px] text-accent font-medium mt-1 truncate">
+                                    ⚠️ Avoid if: {option.contraindications.join(', ')}
+                                  </p>
+                                )}
+                              </div>
+                              <ChevronRight className={`w-4 h-4 text-surface-light group-hover:text-muted flex-shrink-0 transition-transform ${isExpanded ? 'rotate-90' : ''}`} />
+                            </div>
+
+                            {/* Expanded Details */}
+                            <AnimatePresence>
+                              {isExpanded && (
+                                <motion.div 
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: 'auto', opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  className="ml-12 w-[calc(100%-3rem)] border-t border-surface-border pt-3 overflow-hidden"
+                                >
+                                  {option?.ingredients?.length > 0 && (
+                                    <>
+                                      <p className="text-[10px] font-bold text-dim uppercase tracking-widest mb-2">Ingredients</p>
+                                      <div className="grid gap-1.5">
+                                        {option.ingredients.map((ing, idx) => (
+                                          <div key={idx} className="flex justify-between items-center text-[11px] text-muted">
+                                            <span className="capitalize">{typeof ing === 'string' ? ing : ing.name}</span>
+                                            <span className="font-medium text-dim">{typeof ing === 'string' ? '' : ing.quantity}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </>
+                                  )}
+                                  <p className="text-[10px] text-dim mt-3 italic text-center opacity-70">
+                                    Double-click to mark as {isDone ? 'incomplete' : 'done'}
+                                  </p>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </motion.div>
                         </div>
                       );
                     })

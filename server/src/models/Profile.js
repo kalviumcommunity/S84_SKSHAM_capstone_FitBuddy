@@ -13,8 +13,8 @@ const profileSchema = new mongoose.Schema({
   dietaryPreference: { type: String, enum: ['veg', 'non-veg', 'vegan', 'keto'] },
   allergies: [{ type: String }],
   injuries: [{ type: String }],
-  medicalConditions: [{ type: String }],  // New field for medical conditions/diseases
-  customDescription: { type: String, default: '' },  // New field for custom workout description
+  medicalConditions: [{ type: String }], 
+  customDescription: { type: String, default: '' }, 
   budget: { type: String, enum: ['low', 'medium', 'high'], default: 'medium' },
   targetBodyParts: [{ type: String }],
   equipmentAvailable: [{ type: String }],
