@@ -12,6 +12,7 @@ import ChatWidget from '../ChatWidget';
 export default function DashboardLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { user } = useSelector((s) => s.auth);
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
@@ -61,10 +62,17 @@ export default function DashboardLayout() {
               {theme === 'dark' ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
             </button>
             <button
-               onClick={handleLogout}
-               className="p-2 rounded-lg text-dim hover:text-red-500 hover:bg-red-500/10 transition-colors"
+               onClick={() => navigate('/profile')}
+               className="p-1 rounded-full text-dim hover:bg-surface-light/50 transition-colors ml-1"
+               title="Profile"
             >
-              <LogOut className="w-5 h-5" />
+              {user?.avatar ? (
+                <img src={user.avatar} alt="Profile" className="w-7 h-7 rounded-full object-cover" />
+              ) : (
+                <div className="w-7 h-7 rounded-full bg-accent/20 text-accent flex items-center justify-center text-xs font-bold">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+              )}
             </button>
           </div>
         </div>

@@ -9,6 +9,7 @@ import {
   Sun,
   Moon,
   Bug,
+  ShieldAlert
 } from 'lucide-react';
 import { logout } from '../../store/slices/authSlice';
 import { useTheme } from '../../context/ThemeContext';
@@ -16,6 +17,7 @@ import { useTheme } from '../../context/ThemeContext';
 const navItems = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/plan', label: 'My Plan', icon: CalendarDays },
+  { to: '/exercises', label: 'Exercises', icon: Dumbbell },
 ];
 
 export default function Sidebar({ onFeedbackClick }) {
@@ -23,6 +25,13 @@ export default function Sidebar({ onFeedbackClick }) {
   const navigate = useNavigate();
   const { user } = useSelector((s) => s.auth);
   const { theme, toggleTheme } = useTheme();
+  
+  const isAdmin = user?.email === import.meta.env.VITE_ADMIN_EMAIL;
+  
+  const dynamicNavItems = [
+    ...navItems,
+    ...(isAdmin ? [{ to: '/admin', label: 'Admin', icon: ShieldAlert }] : [])
+  ];
 
   const handleLogout = () => {
     dispatch(logout());
@@ -49,7 +58,7 @@ export default function Sidebar({ onFeedbackClick }) {
 
       {/* Nav */}
       <nav className="flex-1 flex flex-col items-center gap-1 w-full px-2">
-        {navItems.map(({ to, label, icon: Icon }) => (
+        {dynamicNavItems.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

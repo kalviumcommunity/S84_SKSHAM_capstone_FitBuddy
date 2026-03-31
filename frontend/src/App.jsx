@@ -13,6 +13,8 @@ import Setup from './pages/Setup';
 import Dashboard from './pages/Dashboard';
 import Plan from './pages/Plan';
 import Profile from './pages/Profile';
+import Exercises from './pages/Exercises';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Layout
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -88,6 +90,8 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/plan" element={<Plan />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/exercises" element={<Exercises />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Route>
 
           {/* Fallback - 404 Page */}
