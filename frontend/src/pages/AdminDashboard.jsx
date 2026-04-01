@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Upload } from 'lucide-react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import PageWrapper from '../components/layout/PageWrapper';
 
 const AdminDashboard = () => {
   const { user } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
   const isAdmin = user?.email === import.meta.env.VITE_ADMIN_EMAIL;
 
   if (!isAdmin) {
@@ -42,12 +43,9 @@ const AdminDashboard = () => {
       });
       console.log('Exercise created:', response.data);
       toast.success('Exercise added successfully!');
-      setTitle('');
-      setDescription('');
-      setImageUrl('');
-      setVideoUrl('');
-      document.getElementById('imageUrlInput').value = '';
-      document.getElementById('videoUrlInput').value = '';
+      setTimeout(() => {
+        navigate('/exercises');
+      }, 500);
     } catch (error) {
       console.error('Exercise creation error:', error);
       const errorMsg = error.response?.data?.message || error.message || 'Failed to add exercise';

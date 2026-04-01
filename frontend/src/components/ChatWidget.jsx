@@ -100,7 +100,7 @@ export default function ChatWidget() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-accent text-white rounded-full shadow-lg flex items-center justify-center md:bottom-8 md:right-8 hover:shadow-accent/30 hover:shadow-xl transition-shadow"
+        className="fixed bottom-24 right-4 z-50 w-14 h-14 bg-accent text-white rounded-full shadow-lg flex items-center justify-center md:bottom-8 md:right-8 hover:shadow-accent/30 hover:shadow-xl transition-shadow"
         title="AI Coach"
       >
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
@@ -114,7 +114,7 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed bottom-24 right-6 z-50 w-[370px] max-h-[520px] bg-surface border border-surface-border rounded-2xl shadow-xl flex flex-col overflow-hidden md:bottom-28 md:right-8"
+            className="fixed bottom-[104px] right-4 z-50 w-[calc(100vw-2rem)] sm:w-[370px] max-h-[520px] bg-surface border border-surface-border rounded-2xl shadow-xl flex flex-col overflow-hidden md:bottom-28 md:right-8"
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-surface-border bg-accent/5">

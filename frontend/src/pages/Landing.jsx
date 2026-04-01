@@ -113,22 +113,44 @@ export default function Landing() {
             in under 60 seconds — tailored to your body, goals, and lifestyle.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="flex items-center justify-center gap-4">
+          <motion.div variants={fadeUp} className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full px-4 sm:px-0">
             <Link
               to={isAuthenticated ? "/dashboard" : "/signup"}
-              className="bg-accent hover:bg-accent-hover text-white font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center gap-2 shadow-glow hover:shadow-glow-lg transition-all"
+              className="bg-accent hover:bg-accent-hover text-white font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 shadow-glow hover:shadow-glow-lg transition-all w-full sm:w-auto"
             >
               {isAuthenticated ? "Track Your Progress" : "Start Free"} <ArrowRight className="w-5 h-5" />
             </Link>
             {!isAuthenticated && (
               <Link
                 to="/login"
-                className="bg-surface-light hover:bg-surface-hover text-[var(--text-main)] font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center gap-2 transition-all"
+                className="bg-surface-light hover:bg-surface-hover text-[var(--text-main)] font-semibold text-base px-8 py-4 rounded-xl inline-flex items-center justify-center gap-2 transition-all w-full sm:w-auto"
               >
                 Log In
               </Link>
             )}
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* ── Stats Bar ─────────────────────────────── */}
+      <section className="py-16 px-6 border-y border-surface-border">
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
+        >
+          {[
+            { val: '10K+', label: 'Active Users' },
+            { val: '50K+', label: 'Plans Generated' },
+            { val: '4.9', label: 'App Rating' },
+            { val: '97%', label: 'Goal Hit Rate' },
+          ].map((s) => (
+            <div key={s.label}>
+              <p className="text-3xl sm:text-4xl font-heading font-bold text-white">{s.val}</p>
+              <p className="text-sm text-muted mt-1 uppercase tracking-wider">{s.label}</p>
+            </div>
+          ))}
         </motion.div>
       </section>
 
@@ -169,28 +191,6 @@ export default function Landing() {
               </motion.div>
             ))}
           </div>
-        </motion.div>
-      </section>
-
-      {/* ── Stats Bar ─────────────────────────────── */}
-      <section className="py-16 px-6 border-y border-surface-border">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center"
-        >
-          {[
-            { val: '10K+', label: 'Active Users' },
-            { val: '50K+', label: 'Plans Generated' },
-            { val: '4.9', label: 'App Rating' },
-            { val: '97%', label: 'Goal Hit Rate' },
-          ].map((s) => (
-            <div key={s.label}>
-              <p className="text-3xl sm:text-4xl font-heading font-bold text-white">{s.val}</p>
-              <p className="text-sm text-muted mt-1 uppercase tracking-wider">{s.label}</p>
-            </div>
-          ))}
         </motion.div>
       </section>
 
