@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![FitBuddy Logo](./docs/images/fitbuddy-logo.png)
+# FitBuddy
 
 **Transform Your Fitness Journey with Personalized AI-Driven Plans**
 
