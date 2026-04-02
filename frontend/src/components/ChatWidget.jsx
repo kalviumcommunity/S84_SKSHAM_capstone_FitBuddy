@@ -100,10 +100,10 @@ export default function ChatWidget() {
         whileHover={{ scale: 1.08 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-24 right-4 z-50 w-14 h-14 bg-accent text-white rounded-full shadow-lg flex items-center justify-center md:bottom-8 md:right-8 hover:shadow-accent/30 hover:shadow-xl transition-shadow"
+        className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-50 w-12 md:w-14 h-12 md:h-14 bg-accent text-white rounded-full shadow-lg flex items-center justify-center hover:shadow-accent/30 hover:shadow-xl transition-shadow"
         title="AI Coach"
       >
-        {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {open ? <X className="w-5 md:w-6 h-5 md:h-6" /> : <MessageCircle className="w-5 md:w-6 h-5 md:h-6" />}
       </motion.button>
 
       {/* Chat panel */}
@@ -114,45 +114,45 @@ export default function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 30, scale: 0.95 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="fixed bottom-[104px] right-4 z-50 w-[calc(100vw-2rem)] sm:w-[370px] max-h-[520px] bg-surface border border-surface-border rounded-2xl shadow-xl flex flex-col overflow-hidden md:bottom-28 md:right-8"
+            className="fixed bottom-36 md:bottom-24 right-4 md:right-8 z-50 w-[calc(100vw-2rem)] max-w-sm md:w-[370px] max-h-[70vh] md:max-h-[520px] bg-surface border border-surface-border rounded-2xl shadow-xl flex flex-col overflow-hidden"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-surface-border bg-accent/5">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-accent/15 rounded-lg flex items-center justify-center">
-                  <Bot className="w-4 h-4 text-accent" />
+            <div className="flex items-center justify-between p-2 md:p-4 border-b border-surface-border bg-accent/5">
+              <div className="flex items-center gap-2 md:gap-3">
+                <div className="w-7 md:w-8 h-7 md:h-8 bg-accent/15 rounded-lg flex items-center justify-center">
+                  <Bot className="w-3 md:w-4 h-3 md:h-4 text-accent" />
                 </div>
                 <div>
-                  <p className="font-heading font-bold text-[var(--text-main)] text-sm tracking-wide uppercase">
+                  <p className="font-heading font-bold text-[var(--text-main)] text-xs md:text-sm tracking-wide uppercase">
                     AI Coach
                   </p>
-                  <p className="text-[10px] text-muted">
-                    {remaining > 0 ? `${remaining} message${remaining !== 1 ? 's' : ''} left today` : 'Daily limit reached'}
+                  <p className="text-[8px] md:text-[10px] text-muted">
+                    {remaining > 0 ? `${remaining} left` : 'Limit reached'}
                   </p>
                 </div>
               </div>
               {messages.length > 0 && (
                 <button
                   onClick={handleClear}
-                  className="p-1.5 rounded-lg text-dim hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="p-1 md:p-1.5 rounded-lg text-dim hover:text-red-400 hover:bg-red-500/10 transition-colors"
                   title="Clear chat"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3 md:w-4 h-3 md:h-4" />
                 </button>
               )}
             </div>
 
             {/* Messages area */}
-            <div ref={scrollRef} className="flex-1 p-4 overflow-y-auto min-h-[240px] max-h-[340px] space-y-3 scroll-smooth">
+            <div ref={scrollRef} className="flex-1 p-2 md:p-4 overflow-y-auto min-h-[140px] md:min-h-[240px] space-y-2 md:space-y-3 scroll-smooth">
               {messages.length === 0 && !sending && (
-                <div className="h-full flex flex-col items-center justify-center text-center gap-3 py-8">
-                  <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center">
-                    <Bot className="w-6 h-6 text-accent" />
+                <div className="h-full flex flex-col items-center justify-center text-center gap-2 md:gap-3 py-4 md:py-8">
+                  <div className="w-8 md:w-12 h-8 md:h-12 bg-accent/10 rounded-2xl flex items-center justify-center">
+                    <Bot className="w-4 md:w-6 h-4 md:h-6 text-accent" />
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[var(--text-main)]">Hey{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋</p>
-                    <p className="text-xs text-muted mt-1 max-w-[240px]">
-                      I'm your AI gym coach. Ask me about exercises, form tips, nutrition, or anything fitness related!
+                    <p className="text-xs md:text-sm font-semibold text-[var(--text-main)]">Hey{user?.name ? `, ${user.name.split(' ')[0]}` : ''}! 👋</p>
+                    <p className="text-[10px] md:text-xs text-muted mt-0.5 md:mt-1 max-w-[200px] md:max-w-[240px]">
+                      Ask me about fitness, nutrition & exercises!
                     </p>
                   </div>
                 </div>
@@ -164,35 +164,35 @@ export default function ChatWidget() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.15 }}
-                  className={`flex gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
+                  className={`flex gap-1.5 md:gap-2.5 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}
                 >
                   {/* Avatar */}
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                  <div className={`w-6 md:w-7 h-6 md:h-7 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5 ${
                     msg.role === 'user' ? 'bg-accent/15' : 'bg-surface-light'
                   }`}>
                     {msg.role === 'user' ? (
                       user?.avatar ? (
-                        <img src={user.avatar} alt="" className="w-7 h-7 rounded-lg object-cover" />
+                        <img src={user.avatar} alt="" className="w-6 md:w-7 h-6 md:h-7 rounded-lg object-cover" />
                       ) : (
-                        <User className="w-3.5 h-3.5 text-accent" />
+                        <User className="w-3 md:w-3.5 h-3 md:h-3.5 text-accent" />
                       )
                     ) : (
-                      <Bot className="w-3.5 h-3.5 text-muted" />
+                      <Bot className="w-3 md:w-3.5 h-3 md:h-3.5 text-muted" />
                     )}
                   </div>
 
                   {/* Bubble */}
-                  <div className={`max-w-[80%] px-3.5 py-2.5 rounded-xl text-sm leading-relaxed ${
+                  <div className={`max-w-[75%] md:max-w-[80%] px-2.5 md:px-3.5 py-1.5 md:py-2.5 rounded-lg md:rounded-xl text-[11px] md:text-sm leading-relaxed ${
                     msg.role === 'user'
                       ? 'bg-accent text-white rounded-tr-sm'
                       : 'bg-surface-light/60 text-[var(--text-main)] rounded-tl-sm border border-surface-border'
                   }`}>
                     <ReactMarkdown
                       components={{
-                        p: ({ node, ...props }) => <p className="mb-2 last:mb-0" {...props} />,
-                        ul: ({ node, ...props }) => <ul className="list-disc ml-4 mb-2" {...props} />,
-                        ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mb-2" {...props} />,
-                        li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                        p: ({ node, ...props }) => <p className="mb-1 md:mb-2 last:mb-0" {...props} />,
+                        ul: ({ node, ...props }) => <ul className="list-disc ml-3 md:ml-4 mb-1 md:mb-2" {...props} />,
+                        ol: ({ node, ...props }) => <ol className="list-decimal ml-3 md:ml-4 mb-1 md:mb-2" {...props} />,
+                        li: ({ node, ...props }) => <li className="mb-0.5 md:mb-1" {...props} />,
                         strong: ({ node, ...props }) => (
                           <strong className={`font-bold ${msg.role === 'assistant' ? 'text-accent' : 'text-white'}`} {...props} />
                         ),
@@ -210,27 +210,27 @@ export default function ChatWidget() {
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex gap-2.5"
+                  className="flex gap-1.5 md:gap-2.5"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-surface-light flex items-center justify-center flex-shrink-0">
-                    <Bot className="w-3.5 h-3.5 text-muted" />
+                  <div className="w-6 md:w-7 h-6 md:h-7 rounded-lg bg-surface-light flex items-center justify-center flex-shrink-0">
+                    <Bot className="w-3 md:w-3.5 h-3 md:h-3.5 text-muted" />
                   </div>
-                  <div className="bg-surface-light/60 border border-surface-border rounded-xl rounded-tl-sm px-4 py-3 flex items-center gap-1.5">
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-muted rounded-full animate-bounce [animation-delay:300ms]" />
+                  <div className="bg-surface-light/60 border border-surface-border rounded-lg md:rounded-xl rounded-tl-sm px-2.5 md:px-4 py-1.5 md:py-3 flex items-center gap-1">
+                    <span className="w-1.5 md:w-2 h-1.5 md:h-2 bg-muted rounded-full animate-bounce [animation-delay:0ms]" />
+                    <span className="w-1.5 md:w-2 h-1.5 md:h-2 bg-muted rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-1.5 md:w-2 h-1.5 md:h-2 bg-muted rounded-full animate-bounce [animation-delay:300ms]" />
                   </div>
                 </motion.div>
               )}
             </div>
 
             {/* Input */}
-            <div className="p-3 border-t border-surface-border flex gap-2">
+            <div className="p-2 md:p-3 border-t border-surface-border flex gap-1.5 md:gap-2">
               <input
                 ref={inputRef}
                 type="text"
-                className="flex-1 bg-surface border border-surface-border rounded-xl px-4 py-2.5 text-sm text-[var(--text-main)] placeholder:text-dim focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/50 transition-all"
-                placeholder={remaining > 0 ? 'Ask your coach...' : 'Daily limit reached'}
+                className="flex-1 bg-surface border border-surface-border rounded-lg md:rounded-xl px-2 md:px-4 py-1.5 md:py-2.5 text-xs md:text-sm text-[var(--text-main)] placeholder:text-dim focus:outline-none focus:ring-2 focus:ring-accent/40 focus:border-accent/50 transition-all"
+                placeholder={remaining > 0 ? 'Ask...' : 'Limit reached'}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -240,13 +240,13 @@ export default function ChatWidget() {
                 whileTap={{ scale: 0.9 }}
                 onClick={handleSend}
                 disabled={sending || !input.trim() || remaining <= 0}
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                className={`w-8 md:w-10 h-8 md:h-10 rounded-lg md:rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
                   sending || !input.trim() || remaining <= 0
                     ? 'bg-surface-light text-dim cursor-not-allowed'
                     : 'bg-accent text-white hover:bg-accent-hover'
                 }`}
               >
-                {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                {sending ? <Loader2 className="w-3 md:w-4 h-3 md:h-4 animate-spin" /> : <Send className="w-3 md:w-4 h-3 md:h-4" />}
               </motion.button>
             </div>
           </motion.div>

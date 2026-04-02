@@ -22,6 +22,7 @@ export default function Button({
   loading = false,
   disabled = false,
   fullWidth = false,
+  rightIcon = null,
   className = '',
   ...props
 }) {
@@ -43,6 +44,7 @@ export default function Button({
     >
       {loading && <Loader2 className="w-5 h-5 animate-spin" />}
       {children}
+      {rightIcon && rightIcon}
     </motion.button>
   );
 }

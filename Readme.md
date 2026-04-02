@@ -222,9 +222,6 @@ IMAGEKIT_URL_ENDPOINT=https://ik.imagekit.io/your_imagekit_id/
 
 # CORS Configuration
 FRONTEND_URL=http://localhost:5173
-
-# Admin Configuration
-ADMIN_EMAIL=your_admin_email@example.com
 ```
 
 #### Frontend `.env` file (`frontend/.env`)
@@ -232,9 +229,6 @@ ADMIN_EMAIL=your_admin_email@example.com
 ```env
 # API Configuration
 VITE_API_URL=http://localhost:5000/api
-
-# Admin Configuration
-VITE_ADMIN_EMAIL=your_admin_email@example.com
 
 # Google OAuth
 VITE_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com

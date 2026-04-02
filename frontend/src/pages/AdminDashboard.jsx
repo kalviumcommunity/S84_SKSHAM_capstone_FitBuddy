@@ -57,24 +57,24 @@ const AdminDashboard = () => {
 
   return (
     <PageWrapper>
-      <div className="flex items-center p-6 pb-2">
-        <h1 className="text-2xl font-bold font-heading text-[var(--text-main)] drop-shadow-sm">
+      <div className="flex items-center p-3 md:p-6 md:pb-2">
+        <h1 className="text-lg md:text-2xl font-bold font-heading text-[var(--text-main)] drop-shadow-sm">
           Admin Dashboard
         </h1>
       </div>
 
-      <div className="flex-1 flex flex-col p-6 max-w-2xl mx-auto w-full">
-        <div className="bg-surface rounded-2xl p-6 shadow-sm border border-surface-border">
-          <h2 className="text-xl font-semibold mb-6 flex items-center gap-2 text-[var(--text-main)]">
-            <Upload className="w-5 h-5 text-accent" />
+      <div className="flex-1 flex flex-col p-2 md:p-6 max-w-2xl mx-auto w-full pb-24 md:pb-10">
+        <div className="bg-surface rounded-2xl p-3 md:p-6 shadow-sm border border-surface-border">
+          <h2 className="text-base md:text-xl font-semibold mb-3 md:mb-6 flex items-center gap-2 text-[var(--text-main)]">
+            <Upload className="w-4 md:w-5 h-4 md:h-5 text-accent" />
             Add New Exercise
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3 md:space-y-5">
             <div>
-              <label className="block text-dim mb-1 text-sm font-medium">Exercise Title</label>
+              <label className="block text-dim mb-1 text-xs md:text-sm font-medium">Exercise Title</label>
               <input 
                 type="text" 
-                className="w-full bg-surface-light border border-surface-border rounded-xl p-3 text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors"
+                className="w-full bg-surface-light border border-surface-border rounded-lg md:rounded-xl p-2 md:p-3 text-sm md:text-base text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="e.g. Push Ups"
@@ -83,9 +83,9 @@ const AdminDashboard = () => {
             </div>
             
             <div>
-              <label className="block text-dim mb-1 text-sm font-medium">Short Description</label>
+              <label className="block text-dim mb-1 text-xs md:text-sm font-medium">Short Description</label>
               <textarea 
-                className="w-full bg-surface-light border border-surface-border rounded-xl p-3 text-[var(--text-main)] h-28 resize-none focus:outline-none focus:border-accent transition-colors"
+                className="w-full bg-surface-light border border-surface-border rounded-lg md:rounded-xl p-2 md:p-3 text-sm md:text-base text-[var(--text-main)] h-16 md:h-28 resize-none focus:outline-none focus:border-accent transition-colors"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="How to perform..."
@@ -93,37 +93,37 @@ const AdminDashboard = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-2 md:gap-4">
               <div>
-                <label className="block text-dim mb-1 text-sm font-medium">Cover Image URL (Optional)</label>
+                <label className="block text-dim mb-1 text-xs md:text-sm font-medium">Cover Image URL (Optional)</label>
                 <input
                   id="imageUrlInput"
                   type="url"
                   placeholder="e.g. https://ik.imagekit.io/yourname/exercise.jpg"
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  className="w-full bg-surface-light border border-surface-border rounded-xl p-3 text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors text-sm"
+                  className="w-full bg-surface-light border border-surface-border rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors"
                 />
-                <p className="mt-1 text-xs text-dim">Upload to ImageKit, Imgur, or any image hosting and paste URL here</p>
+                <p className="mt-1 text-xs text-dim hidden md:block">Upload to ImageKit, Imgur, or any image hosting and paste URL here</p>
                 {imageUrl && (
-                  <div className="mt-2 text-xs text-green-400">
+                  <div className="mt-1 text-xs text-green-400">
                     ✓ Image URL accepted
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block text-dim mb-1 text-sm font-medium">YouTube Video URL (Optional)</label>
+                <label className="block text-dim mb-1 text-xs md:text-sm font-medium">YouTube Video URL (Optional)</label>
                 <input
                   id="videoUrlInput"
                   type="url"
                   placeholder="e.g. https://youtu.be/dQw4w9WgXcQ"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
-                  className="w-full bg-surface-light border border-surface-border rounded-xl p-3 text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors text-sm"
+                  className="w-full bg-surface-light border border-surface-border rounded-lg md:rounded-xl p-2 md:p-3 text-xs md:text-sm text-[var(--text-main)] focus:outline-none focus:border-accent transition-colors"
                 />
                 {videoUrl && (
-                  <div className="mt-2 text-xs text-green-400">
+                  <div className="mt-1 text-xs text-green-400">
                     ✓ YouTube link accepted
                   </div>
                 )}
@@ -133,9 +133,9 @@ const AdminDashboard = () => {
             <button 
               type="submit" 
               disabled={loading}
-              className="w-full bg-accent hover:bg-accent-hover text-white rounded-xl py-3.5 font-bold transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-accent/25"
+              className="w-full bg-accent hover:bg-accent-hover text-white rounded-lg md:rounded-xl py-2 md:py-3.5 text-sm md:text-base font-bold transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-accent/25 mt-3 md:mt-6"
             >
-              {loading ? 'Creating Exercise...' : 'Add Exercise'}
+              {loading ? 'Creating...' : 'Add Exercise'}
             </button>
           </form>
         </div>
